@@ -14,12 +14,32 @@ import { enDocsLink, zhDocsLink, pluginsZh, pluginsEn } from '@/common/link_urls
 const locale = store.state.lang
 const VueI18n = lang[locale]
 
+export function getDeploymentID() {
+  try {
+    const key = `deploymentID=`
+    let value = 'cloud'
+    const cStrArray = document.cookie.split(';')
+    cStrArray.forEach(($) => {
+      const oneCStr = $.trim()
+      if (oneCStr.indexOf(key) === 0) {
+        value = oneCStr.substring(key.length, oneCStr.length)
+      }
+    })
+    return value
+  } catch (error) {
+    return 'cloud'
+  }
+}
+
 /**
  * 获取基础的验证信息
  * @param null
  * @return User: object
  */
 export function getBasicAuthInfo() {
+  if (process.env.VUE_APP_BUILD_ENV === 'cloud') {
+    return { username: getDeploymentID() }
+  }
   return store.state.user
 }
 

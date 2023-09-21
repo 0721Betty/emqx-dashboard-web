@@ -60,15 +60,23 @@ const httpMap = httpCode[lang]
 
 const pluginPages = ['schemas', 'rules', 'resources', 'setting']
 
-Object.assign(axios.defaults, {
+const axiosOptions = {
   headers: {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-cache',
   },
   baseURL: store.getters.httpBaseUrl,
   timeout: store.state.httpTimeout,
-  auth: {},
-})
+}
+
+if (process.env.VUE_APP_BUILD_ENV === 'cloud') {
+  Object.assign(axios.defaults, axiosOptions)
+} else {
+  Object.assign(axios.defaults, {
+    ...axiosOptions,
+    auth: {},
+  })
+}
 
 axios.interceptors.request.use(
   (config) => {
@@ -81,8 +89,13 @@ axios.interceptors.request.use(
       toLogin()
       throw new Error(httpMap['-1'])
     }
-    config.auth.username = user.username
-    config.auth.password = user.password
+    if (process.env.VUE_APP_BUILD_ENV === 'cloud') {
+      const { token } = JSON.parse(localStorage.getItem('adminUser') || '{}')
+      config.headers.Authorization = `Bearer ${token}`
+    } else {
+      config.auth.username = user.username
+      config.auth.password = user.password
+    }
 
     store.dispatch('LOADING', true)
     // lwm2m observe

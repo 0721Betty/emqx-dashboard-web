@@ -61,6 +61,7 @@
 <script>
 import Breadcrumb from './Breadcrumb.vue'
 import { loadAlarm } from '@/api/common'
+import { getDeploymentID } from '@/common/utils'
 
 export default {
   name: 'NavHeader',
@@ -83,6 +84,9 @@ export default {
       return { left: !this.$store.state.leftBarCollapse ? '201px' : '80px' }
     },
     username() {
+      if (process.env.VUE_APP_BUILD_ENV === 'cloud') {
+        return getDeploymentID()
+      }
       return this.$store.state.user.username || this.$t('components.notLoggedIn')
     },
     alertText() {

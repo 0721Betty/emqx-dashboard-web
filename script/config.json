@@ -11,7 +11,7 @@
   },
   "cloud": {
     "baseURL": "/dashboard/api/v4",
-    "publicPath": "/dashboard",
+    "publicPath": "/4.42/dashboard",
     "useRelativeResourcePath": false
   }
 }
